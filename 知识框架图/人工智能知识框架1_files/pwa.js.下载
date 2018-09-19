@@ -1,0 +1,42 @@
+~function () {
+	if (location.protocol !== 'https:') {
+		return;
+	}
+
+	var QcloudStat = window.QcloudStat;
+	var $ua = window.$ua || {};
+	var platform = 'pc';
+
+	if ($ua.device && $ua.device.type) {
+		platform = $ua.device.type;
+	}
+
+	if ('serviceWorker' in navigator) {
+		navigator.serviceWorker.register('/developer/sw.js', { scope: '/' }).then(function () {
+			if (!QcloudStat) {
+				return;
+			}
+
+			var expValueStr = 'community.pwa.service_worker_register_' + platform;
+			QcloudStat.reportAction({ expKey: 'hotrep', expValue: expValueStr });
+		});
+	}
+
+	window.addEventListener('beforeinstallprompt', function (evt) {
+		if (!QcloudStat) {
+			return;
+		}
+
+		var expValueStr;
+
+		evt.userChoice.then(function (choiceResult) {
+			if (choiceResult.outcome == 'dismissed') {
+				expValueStr = 'community.pwa.cancle_add_to_home_screen_' + platform;
+			} else {
+				expValueStr = 'community.pwa.agree_add_to_home_screen_' + platform;
+			}
+
+			QcloudStat.reportAction({ expKey: 'hotrep', expValue: expValueStr });
+		});
+	});
+}();

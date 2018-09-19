@@ -1,0 +1,36 @@
+(function() {
+
+    if (!window.$ || !$('#qcLeftNavSwitcher').length) {
+        return;
+    }
+    
+    var leftnavScript = "//main.qcloudimg.com/scripts/qccomponents/leftnav.3f9a9d7c796f9e3344cd980ca92c06f9.js";
+    var logicalScript = "//imgcache.qq.com/qcloud/main/scripts/release/qccomponent/index.7dfd8992692d8e3e1f97.js?max_age=31536000";
+    var step = 0;
+    var COMPLETED = 2;
+    
+    function loadScript(src, callback) {
+        var script = document.createElement('script');
+        script.onerror = function(error) { callback(error, null); };
+        script.onload = function() { callback(null, null); };
+        script.src = src;
+        document.head.appendChild(script);
+    }
+
+    function loadScriptCallback(error) {
+        if (error) {
+            console.error('setup qccomponent error:', error);
+            return;
+        }
+
+        step++;
+
+        if (step === COMPLETED && window.QCComponent) {
+            window.QCComponent.init();
+        }
+    }
+
+    loadScript(leftnavScript, loadScriptCallback);
+    loadScript(logicalScript, loadScriptCallback);
+})();
+    
